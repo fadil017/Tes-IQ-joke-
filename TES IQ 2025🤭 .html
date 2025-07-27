@@ -1,0 +1,248 @@
+<!-- WEB TES IQ PRO EDITION - RANK TITAN, WAKTU 10 DETIK, HADIAH EBOOK BY FADIL --><!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tes IQ PRO</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+    * {margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif;}
+    body {
+      background: linear-gradient(-45deg, #74ebd5, #ACB6E5);
+      background-size: 400% 400%; animation: gradient 15s ease infinite;
+      display: flex; align-items: center; justify-content: center;
+      height: 100vh; padding: 20px;
+    }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 650px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: fadeIn 1.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #4e54c8;
+      text-shadow: 1px 1px 2px #aaa;
+    }
+    h2 { font-size: 20px; margin-bottom: 20px; color: #333; }
+    input, select {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+    button {
+      background: #4e54c8;
+      color: #fff;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    button:hover {background: #5b5fc9;}
+    .question, .result, #certifikat, #rules {display: none;}
+    .fade {animation: fadeIn 1s ease;}
+    #timer {font-weight: bold; color: red; margin-bottom: 10px; display: none;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 Tes IQ PRO</h1>
+    <h2>Selamat datang! Uji kecerdasanmu sesuai rank yang kamu pilih.</h2><div id="rules">
+  <h3>📌 Aturan Main:</h3>
+  <ul style="text-align:left">
+    <li>Isi data diri lengkap untuk verifikasi.</li>
+    <li>Pilih rank sesuai kemampuan (Bronze – Titan).</li>
+    <li>Rank Titan hanya untuk yang benar-benar jenius!</li>
+    <li>Jawab semua soal sebaik mungkin dengan waktu terbatas.</li>
+    <li>Jika kamu lulus Rank Titan, kamu akan mendapatkan hadiah.</li>
+  </ul>
+</div>
+
+<div id="start-screen">
+  <input type="text" id="nama" placeholder="Nama lengkap" required>
+  <input type="text" id="sekolah" placeholder="Asal Sekolah" required>
+  <input type="text" id="kelas" placeholder="Kelas / Umur" required>
+  <input type="text" id="kodeVerifikasi" placeholder="Kode Verifikasi Diri" required>
+  <select id="rank" onchange="cekTitan()">
+    <option value="bronze">Bronze (Mudah)</option>
+    <option value="gold">Gold (Sedang)</option>
+    <option value="diamond">Diamond (Sulit)</option>
+    <option value="titan">TITAN (Ekstrem)</option>
+  </select>
+  <button onclick="showRules()">Lanjut</button>
+</div>
+
+<div id="peringatan-titan" style="display:none; color:red; margin-bottom:10px;">
+  ⚠️ Rank TITAN hanya untuk orang dengan kepintaran di atas rata-rata. Waktu tiap soal: 10 detik.
+</div>
+
+<div id="konfirmasi" style="display:none;">
+  <p>Yakin mau mulai? Rank yang dipilih akan menentukan kesulitan soal.</p>
+  <button onclick="startTest()">Ya, mulai!</button>
+  <button onclick="batalMulai()">Batal</button>
+</div>
+
+<div id="quiz-container" style="display:none;">
+  <div id="timer"></div>
+  <div id="question-box"></div>
+  <button onclick="nextQuestion()">Selanjutnya</button>
+</div>
+
+<div class="result" id="result"></div>
+<div id="certifikat"></div>
+
+  </div>  <script>
+    const soal = {
+      bronze: [
+        { question: "1 + 1 = ?", answer: "2" },
+        { question: "3 + 2 = ?", answer: "5" },
+        { question: "5 - 3 = ?", answer: "2" },
+        { question: "2 x 3 = ?", answer: "6" },
+        { question: "10 ÷ 2 = ?", answer: "5" }
+      ],
+      gold: [
+        { question: "Huruf ke-3 dari 'CERDAS'?", answer: "R" },
+        { question: "A=1, Z=?", answer: "26" },
+        { question: "5 x 5 = ?", answer: "25" },
+        { question: "10^2 = ?", answer: "100" },
+        { question: "Bulan ke-5?", answer: "Mei" }
+      ],
+      diamond: [
+        { question: "Akar dari 144?", answer: "12" },
+        { question: "2, 4, 8, ...?", answer: "16" },
+        { question: "IQ normal manusia?", answer: "100" },
+        { question: "64 ÷ 8 = ?", answer: "8" },
+        { question: "Fibonacci ke-6?", answer: "8" }
+      ],
+      titan: [
+        { question: "7 x 13 = ?", answer: "91" },
+        { question: "√625 = ?", answer: "25" },
+        { question: "101 - 77 = ?", answer: "24" },
+        { question: "11^2 = ?", answer: "121" },
+        { question: "Jika A=1, maka CAT = ?", answer: "24" },
+        { question: "Huruf ke-10 alfabet?", answer: "J" },
+        { question: "Sisi kubus = ?", answer: "6" },
+        { question: "1 jam = ... detik?", answer: "3600" },
+        { question: "Bilangan prima ke-5?", answer: "11" },
+        { question: "(8 x 8) ÷ 4 = ?", answer: "16" }
+      ]
+    };
+
+    let currentQuestion = 0;
+    let score = 0;
+    let soalAktif = [];
+    let namaPengguna = "";
+    let timerInterval;
+    let rankNow = "";
+
+    function cekTitan() {
+      const rank = document.getElementById('rank').value;
+      document.getElementById('peringatan-titan').style.display = (rank === 'titan') ? 'block' : 'none';
+    }
+
+    function showRules() {
+      if (["nama", "sekolah", "kelas", "kodeVerifikasi"].some(id => document.getElementById(id).value.trim() === '')) {
+        alert("Isi semua data untuk verifikasi!"); return;
+      }
+      namaPengguna = document.getElementById('nama').value.trim();
+      rankNow = document.getElementById('rank').value;
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('rules').style.display = 'block';
+      document.getElementById('konfirmasi').style.display = 'block';
+    }
+
+    function batalMulai() {
+      document.getElementById('konfirmasi').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'block';
+      document.getElementById('rules').style.display = 'none';
+    }
+
+    function startTest() {
+      soalAktif = soal[rankNow];
+      document.getElementById('konfirmasi').style.display = 'none';
+      document.getElementById('rules').style.display = 'none';
+      document.getElementById('quiz-container').style.display = 'block';
+      currentQuestion = 0; score = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (currentQuestion < soalAktif.length) {
+        const q = soalAktif[currentQuestion];
+        document.getElementById('question-box').innerHTML = `
+          <p>${q.question}</p>
+          <input type="text" id="answer" placeholder="Jawabanmu...">
+        `;
+        if (rankNow === 'titan') startTimer();
+      } else {
+        showResult();
+      }
+    }
+
+    function nextQuestion() {
+      if (rankNow === 'titan') stopTimer();
+      const userAnswer = document.getElementById('answer').value.trim().toLowerCase();
+      const correct = soalAktif[currentQuestion].answer.toLowerCase();
+      if (userAnswer === correct) score += 10;
+      currentQuestion++;
+      showQuestion();
+    }
+
+    function startTimer() {
+      let timeLeft = 10;
+      document.getElementById('timer').style.display = 'block';
+      document.getElementById('timer').innerText = `⏱️ ${timeLeft} detik`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = `⏱️ ${timeLeft} detik`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          nextQuestion();
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timer').style.display = 'none';
+    }
+
+    function showResult() {
+      document.getElementById('quiz-container').style.display = 'none';
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('certifikat').style.display = 'block';
+      const nilai = score + 80;
+      let hadiah = "";
+      if (rankNow === 'titan' && score === 100) {
+        hadiah = `<p>🎁 Selamat! Kamu membuka hadiah Titan: <a href='https://drive.google.com/file/d/1hDqOUMGqPqovlTaSi9lCPs9EoUfD3YS8/view?usp=drivesdk' target='_blank'>Download eBook</a></p>`;
+      }
+      document.getElementById('result').innerHTML = `<h3>🎉 Selamat, ${namaPengguna}!</h3><p>Kamu menyelesaikan rank <strong>${rankNow.toUpperCase()}</strong> dengan IQ: <strong>${nilai}</strong></p>${hadiah}`;
+      document.getElementById('certifikat').innerHTML = `
+        <div class="fade">
+          <h3>📄 Sertifikat Hasil Tes</h3>
+          <p>Nama: ${namaPengguna}</p>
+          <p>IQ: ${nilai}</p>
+          <p>Rank: ${rankNow.toUpperCase()}</p>
+          <p><em>Verifikasi Mandiri oleh Sistem</em></p>
+        </div>
+      `;
+    }
+  </script></body>
+</html>
